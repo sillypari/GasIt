@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GasIt - A Number Guessing Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        accent: '#21808D',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply min-h-screen text-white font-light;
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(32deg, #000428 0%, #024c8d 100%);
+                background-attachment: fixed;
+                position: relative;
+                overflow-x: hidden;
+            }
+            .glassmorphic {
+                background: rgba(39, 63, 79, 0.404);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(33, 128, 141, 0.7);
+                
+            }
+            .stat-tile {
+                @apply p-4 rounded-lg text-center glassmorphic;
+                transition: all 0.5s ease;
+            }
+            .stat-tile:hover {
+                transform: translateY(-6px);
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl animate-fade-in">
+        <div class="glassmorphic rounded-2xl p-8 md:p-10 w-full">
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <h1 class="text-4xl md:text-5xl font-medium mb-2">
+                    <span id="typing-text"></span><span class="typing-cursor">|</span>
+                </h1>
+                <p class="text-gray-300">A number guessing game</p>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Left Column: Stats -->
+                <div class="w-full md:w-1/3 space-y-4">
+                    <div class="stat-tile">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="stat-icon bg-blue-500/20 text-blue-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-3 text-gray-300">Games</span>
+                            </div>
+                            <span class="stat-value" id="games-played">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-tile">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="stat-icon bg-green-500/20 text-green-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-3 text-gray-300">Wins</span>
+                            </div>
+                            <span class="stat-value" id="wins">0</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-tile">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="stat-icon bg-yellow-500/20 text-yellow-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                </div>
+                                <span class="ml-3 text-gray-300">Probability</span>
+                            </div>
+                            <span class="stat-value" id="probability">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Game -->
+                <div class="flex-1">
+
+                    <!-- Game Start -->
+                    <div class="space-y-6" id="start-section">
+                        <div>
+                            <label for="max-number" class="block text-sm font-medium text-gray-300 mb-2">
+                                Maximum Number
+                            </label>
+                            <input
+                                type="number"
+                                id="max-number"
+                                min="1"
+                                value="100"
+                                class="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition text-center"
+                                placeholder="Enter any positive number"
+                            >
+                            <p class="mt-1 text-xs text-gray-400">Higher numbers = more challenging!</p>
+                        </div>
+                        <button
+                            id="start-game"
+                            class="w-full bg-accent hover:bg-opacity-90 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-gray-900"
+                        >
+                            Start Game
+                        </button>
+                    </div>
+
+                    <!-- Game Section (initially hidden) -->
+                    <div id="game-section" class="hidden space-y-6">
+                        <div>
+                            <p class="text-gray-300 mb-2 text-center">
+                                Guess a number between <span class="font-medium">0</span> and <span id="max-number-display" class="font-medium">100</span>
+                            </p>
+                            <p class="text-sm text-center text-gray-400 mb-4">
+                                Attempts remaining: <span id="attempts-remaining" class="font-medium">5</span>
+                            </p>
+                            
+                            <div class="flex gap-2">
+                                <input
+                                    type="number"
+                                    id="guess-input"
+                                    class="flex-1 px-4 py-3 rounded-l-lg bg-gray-900/50 border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition text-center text-xl"
+                                    placeholder="Your guess"
+                                    min="0"
+                                >
+                                <button
+                                    id="guess-button"
+                                    class="bg-accent hover:bg-opacity-90 text-white font-medium py-3 px-6 rounded-r-lg transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-gray-900"
+                                >
+                                    Guess
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Result Card (initially hidden) -->
+                        <div id="result-card" class="hidden p-6 rounded-xl transition-all duration-300 transform translate-y-2 opacity-0">
+                            <div class="flex items-start">
+                                <div id="result-icon" class="flex-shrink-0 mr-4 mt-1">
+                                    <!-- Icon will be inserted here by JavaScript -->
+                                </div>
+                                <div class="flex-1">
+                                    <p id="result-message" class="text-lg font-light text-gray-200 text-left leading-relaxed"></p>
+                                    <p id="attempts-left" class="text-sm text-gray-400 mt-1"></p>
+                                </div>
+                            </div>
+                            <div class="mt-6 text-center">
+                                <button
+                                    id="play-again"
+                                    class="play-again-btn bg-accent hover:bg-accent/90 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200 max-w-[160px] w-full"
+                                >
+                                    Play Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+
+    <!-- Game Section (initially hidden) -->
+    <div id="game-section" class="hidden">
+        <div class="text-center mb-8">
+            <p class="text-gray-300 mb-4">Guess a number between 0 and <span id="max-number-display">100</span></p>
+            <div class="flex gap-2 mb-6">
+                <input
+                    type="number"
+                    id="guess-input"
+                    class="flex-1 px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition text-center text-xl"
+                    placeholder="Enter your guess"
+                    min="0"
+                >
+                <button
+                    id="guess-button"
+                    class="bg-accent hover:bg-opacity-90 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-gray-900"
+                >
+                    Guess
+                </button>
+            </div>
+            <div class="text-sm text-gray-400">
+                Guesses: <span id="current-guesses">0</span>
+            </div>
+        </div>
+
+        <!-- Result Card (initially hidden) -->
+        <div id="result-card" class="hidden p-4 rounded-lg mb-6 text-center">
+            <div class="text-4xl mb-2" id="result-icon"></div>
+            <p id="result-message" class="mb-4"></p>
+            <button
+                id="play-again"
+                class="px-6 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            >
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script>
+        // Typing animation for the title
+        const text = 'GasIt';
+        const typingText = document.getElementById('typing-text');
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100; // milliseconds per character
+        let pauseDuration = 3000; // pause at the end of typing
+
+        function type() {
+            const currentText = text.substring(0, charIndex);
+            typingText.textContent = currentText;
+            
+            if (!isDeleting && charIndex < text.length) {
+                // Typing forward
+                charIndex++;
+                setTimeout(type, typingSpeed);
+            } else if (isDeleting && charIndex > 0) {
+                // Deleting
+                charIndex--;
+                setTimeout(type, typingSpeed / 2);
+            } else if (charIndex === text.length) {
+                // Pause at the end of typing
+                isDeleting = true;
+                setTimeout(type, pauseDuration);
+            } else {
+                // Reset and start over
+                isDeleting = false;
+                charIndex = 0;
+                setTimeout(type, 500);
+            }
+        }
+
+        // Start the typing animation
+        setTimeout(type, 500); // Initial delay before starting
+    </script>
+    <style>
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .typing-cursor {
+            display: inline-block;
+            margin-left: 1px;
+            animation: blink 1.5s step-end infinite;
+            color: #21808D;
+        }
+        
+        /* Stats styles */
+        .stat-tile {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-value.updated {
+            animation: bounce 0.5s ease;
+            color: #21808D;
+        }
+        
+        /* Result Card Styles */
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            transform: translateY(10px);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            overflow: hidden;
+            text-align: left;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .result-card.visible {
+            animation: slideUpFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        .result-icon {
+            width: 24px;
+            height: 24px;
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: scale(0.5);
+            flex-shrink: 0;
+            margin-top: 0.15rem;
+        }
+        
+        .result-message {
+            animation: fadeIn 0.4s ease-out 0.1s forwards;
+            opacity: 0;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+        
+        #attempts-left {
+            animation: fadeIn 0.4s ease-out 0.15s forwards;
+            opacity: 0;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.5rem;
+        }
+        
+        .play-again-btn {
+            animation: fadeInUp 0.4s ease-out 0.2s forwards;
+            opacity: 0;
+            transform: translateY(10px);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+        
+        .play-again-btn:hover {
+            background-color: #2a8d9c !important;
+        }
+        
+        .result-card.success {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+        }
+        
+        .result-card.error {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+        
+        .result-card.warning {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideUpFadeIn {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Hide elements utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</body>
+</html>
