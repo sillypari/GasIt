@@ -153,17 +153,17 @@
                                 Attempts remaining: <span id="attempts-remaining" class="font-medium">5</span>
                             </p>
                             
-                            <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row gap-3 mb-6">
                                 <input
                                     type="number"
                                     id="guess-input"
-                                    class="flex-1 px-4 py-3 rounded-l-lg bg-gray-900/50 border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition text-center text-xl"
+                                    class="w-full px-4 py-3 rounded-lg sm:rounded-r-none bg-gray-900/50 border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent outline-none transition text-center text-xl"
                                     placeholder="Your guess"
                                     min="0"
                                 >
                                 <button
                                     id="guess-button"
-                                    class="bg-accent hover:bg-opacity-90 text-white font-medium py-3 px-6 rounded-r-lg transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-gray-900"
+                                    class="w-full sm:w-auto bg-accent hover:bg-opacity-90 text-white font-medium py-3 px-6 rounded-lg sm:rounded-l-none transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent focus:ring-offset-gray-900"
                                 >
                                     Guess
                                 </button>
